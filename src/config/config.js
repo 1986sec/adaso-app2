@@ -11,7 +11,7 @@ const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   
   // MongoDB Configuration
-  mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/adaso_db',
+  mongoURI: process.env.MONGO_URI || 'mongodb://localhost:27017/adaso_db',
   
   // JWT Configuration
   jwtSecret: process.env.JWT_SECRET || 'adaso_super_secret_jwt_key_2024',
