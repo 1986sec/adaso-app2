@@ -20,7 +20,10 @@ const connectDB = async () => {
       bufferCommands: true, // Buffer'ı aç - bu önemli!
       maxPoolSize: 1, // Tek bağlantı
       minPoolSize: 1,
-      maxIdleTimeMS: 30000
+      maxIdleTimeMS: 30000,
+      retryWrites: true,
+      w: 'majority',
+      readPreference: 'primary'
     });
     
     // Bağlantı durumunu kontrol et
