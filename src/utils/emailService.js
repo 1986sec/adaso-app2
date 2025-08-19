@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 const path = require('path');
 const config = require(path.join(process.cwd(), 'src', 'config', 'config.js'));
 
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: config.email.host,
   port: config.email.port,
   secure: false,
