@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const config = require('../config');
+const path = require('path');
+const config = require(path.join(process.cwd(), 'src', 'config', 'config.js'));
 
 const userSchema = new mongoose.Schema({
   username: {

@@ -1,5 +1,6 @@
 const redis = require('redis');
-const config = require('../config/config');
+const path = require('path');
+const config = require(path.join(process.cwd(), 'src', 'config', 'config.js'));
 
 let redisClient = null;
 

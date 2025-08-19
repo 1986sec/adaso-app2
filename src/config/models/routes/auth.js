@@ -1,10 +1,11 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const User = require('../User');
-const PasswordReset = require('../PasswordReset');
-const { authenticateToken } = require('./middleware/auth');
-const { sendPasswordResetEmail } = require('../../utils/emailService');
-const config = require('../config');
+const path = require('path');
+const User = require(path.join(process.cwd(), 'src', 'config', 'models', 'User.js'));
+const PasswordReset = require(path.join(process.cwd(), 'src', 'config', 'models', 'PasswordReset.js'));
+const { authenticateToken } = require(path.join(process.cwd(), 'src', 'config', 'models', 'routes', 'middleware', 'auth.js'));
+const { sendPasswordResetEmail } = require(path.join(process.cwd(), 'src', 'utils', 'emailService.js'));
+const config = require(path.join(process.cwd(), 'src', 'config', 'config.js'));
 const router = express.Router();
 
 // Register
