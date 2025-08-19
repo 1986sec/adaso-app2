@@ -70,5 +70,3 @@ const checkConnection = () => {
 };
 
 module.exports = { connectDB, checkConnection };
-
-module.exports = connectDB;
