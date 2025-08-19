@@ -123,8 +123,12 @@ app.use((err, req, res, next) => {
 
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`🚀 ADASO API Server running on http://localhost:${PORT}`);
-    console.log(`📊 Database: Mock Mode`);
+    const serverUrl = config.nodeEnv === 'production' 
+      ? 'https://adaso-backend.onrender.com' 
+      : `http://localhost:${PORT}`;
+    
+    console.log(`🚀 ADASO API Server running on ${serverUrl}`);
+    console.log(`📊 Database: ${config.nodeEnv === 'production' ? 'MongoDB Atlas' : 'Mock Mode'}`);
     console.log(`🌍 Environment: ${config.nodeEnv}`);
     console.log(`🔐 JWT Secret: ${config.jwtSecret ? 'Set' : 'Default'}`);
     console.log(`📧 Email: ${config.email.user !== 'your-email@gmail.com' ? 'Configured' : 'Not configured'}`);
