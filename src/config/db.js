@@ -11,13 +11,13 @@ const connectDB = async () => {
     console.log('📍 URI:', config.mongoURI ? 'Mevcut' : 'Eksik');
     console.log('🌍 Environment:', config.nodeEnv);
     
-    // MongoDB bağlantısı
+    // MongoDB bağlantısı - bufferCommands: true ile
     await mongoose.connect(config.mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       serverSelectionTimeoutMS: 60000, // 60 saniye
       socketTimeoutMS: 60000, // 60 saniye
-      bufferCommands: false, // Buffer'ı kapat
+      bufferCommands: true, // Buffer'ı aç - bu önemli!
       maxPoolSize: 1, // Tek bağlantı
       minPoolSize: 1,
       maxIdleTimeMS: 30000
