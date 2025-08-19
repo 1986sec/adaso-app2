@@ -68,13 +68,31 @@ router.post('/login', async (req, res) => {
     const username = kullaniciAdi;
     const password = sifre;
     
+    console.log('🔍 Aranan username:', username);
+    console.log('🔍 Aranan password:', password);
+    
     const user = await User.findOne({ 
       $or: [{ username }, { email: username }],
       isActive: true 
     });
     
-    if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ message: 'Geçersiz kullanıcı adı veya şifre' });
+    console.log('🔍 Bulunan user:', user ? 'Var' : 'Yok');
+    if (user) {
+      console.log('🔍 User ID:', user._id);
+      console.log('🔍 User username:', user.username);
+      console.log('🔍 User email:', user.email);
+      console.log('🔍 User password hash:', user.password);
+    }
+    
+    if (!user) {
+      return res.status(401).json({ message: 'Kullanıcı bulunamadı' });
+    }
+    
+    const passwordMatch = await user.comparePassword(password);
+    console.log('🔍 Şifre eşleşmesi:', passwordMatch);
+    
+    if (!passwordMatch) {
+      return res.status(401).json({ message: 'Şifre hatalı' });
     }
 
     user.lastLogin = new Date();
