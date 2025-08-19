@@ -49,7 +49,8 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     optionsSuccessStatus: 200
-});
+}));
+
 app.use(express.json({ limit: config.upload.maxFileSize }));
 app.use(express.urlencoded({ extended: true, limit: config.upload.maxFileSize }));
 app.use('/uploads', express.static('uploads'));
