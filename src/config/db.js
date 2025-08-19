@@ -15,8 +15,7 @@ const connectDB = async () => {
       useUnifiedTopology: true,
       serverSelectionTimeoutMS: 30000,
       socketTimeoutMS: 30000,
-      bufferCommands: true,
-      bufferMaxEntries: 1000
+      bufferCommands: true
     };
     
     await mongoose.connect(config.mongoURI, connectionOptions);
