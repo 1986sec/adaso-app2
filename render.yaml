@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: adaso-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        value: mongodb+srv://y3456605:pl6jF7glwEnTJO30@adaso-cluster.fjk5ist.mongodb.net/adaso_db?retryWrites=true&w=majority&appName=adaso-cluster
+      - key: JWT_SECRET
+        value: adaso-super-secret-jwt-key-2024-production
+      - key: FRONTEND_URL
+        value: https://adaso.net
+      - key: CORS_ORIGINS
+        value: https://adaso.net
