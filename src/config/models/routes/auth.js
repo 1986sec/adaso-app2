@@ -92,11 +92,28 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Kullanıcı bulunamadı' });
     }
     
+    // Şifre debug'ı
+    console.log('🔍 Frontend\'den gelen şifre:', password);
+    console.log('🔍 Database\'deki hash:', user.password);
+    
+    // Manuel şifre karşılaştırması
+    const bcrypt = require('bcrypt');
+    const manualCompare = await bcrypt.compare(password, user.password);
+    console.log('🔍 Manuel bcrypt karşılaştırması:', manualCompare);
+    
     const passwordMatch = await user.comparePassword(password);
-    console.log('🔍 Şifre eşleşmesi:', passwordMatch);
+    console.log('🔍 User.comparePassword sonucu:', passwordMatch);
     
     if (!passwordMatch) {
-      return res.status(401).json({ message: 'Şifre hatalı' });
+      return res.status(401).json({ 
+        message: 'Şifre hatalı',
+        debug: {
+          frontendPassword: password,
+          dbHash: user.password,
+          manualCompare: manualCompare,
+          userCompare: passwordMatch
+        }
+      });
     }
 
     user.lastLogin = new Date();
