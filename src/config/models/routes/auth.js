@@ -61,7 +61,12 @@ router.post('/register', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   try {
-    const { username, password } = req.body;
+    console.log('🔐 Login request body:', req.body); // Debug için
+    
+    // Frontend'den gelen field'ları map et
+    const { kullaniciAdi, sifre } = req.body;
+    const username = kullaniciAdi;
+    const password = sifre;
     
     const user = await User.findOne({ 
       $or: [{ username }, { email: username }],

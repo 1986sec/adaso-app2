@@ -76,6 +76,17 @@ app.get('/api/test', (req, res) => {
     res.json({ message: 'API çalışıyor!', timestamp: new Date() });
 });
 
+// Users listesi route'u (sadece development için)
+app.get('/api/users', async (req, res) => {
+    try {
+        const User = require(path.join(__dirname, 'config', 'models', 'User.js'));
+        const users = await User.find({}, { password: 0 }); // Şifreleri gösterme
+        res.json({ users });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // Health check route
 app.get('/api/health', (req, res) => {
     res.json({ 
