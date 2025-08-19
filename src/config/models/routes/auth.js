@@ -71,8 +71,12 @@ router.post('/login', async (req, res) => {
     console.log('🔍 Aranan username:', username);
     console.log('🔍 Aranan password:', password);
     
+    // Case-insensitive username search
     const user = await User.findOne({ 
-      $or: [{ username }, { email: username }],
+      $or: [
+        { username: { $regex: new RegExp(`^${username}$`, 'i') } }, // Case-insensitive username
+        { email: { $regex: new RegExp(`^${username}$`, 'i') } }     // Case-insensitive email
+      ],
       isActive: true 
     });
     
