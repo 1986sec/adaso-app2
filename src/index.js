@@ -5,7 +5,7 @@ const morgan = require('morgan');
 const compression = require('compression');
 const path = require('path');
 const config = require(path.join(__dirname, 'config', 'config.js'));
-const connectDB = require(path.join(__dirname, 'config', 'db.js'));
+const { connectDB, checkConnection } = require(path.join(__dirname, 'config', 'db.js'));
 
 // Import middleware
 const { securityMiddleware, generalRateLimiter } = require('./middleware/security');
