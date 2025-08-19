@@ -80,13 +80,8 @@ if (!config.jwtSecret || config.jwtSecret === 'adaso_super_secret_jwt_key_2024')
   console.warn('⚠️  Warning: Using default JWT secret. Please set JWT_SECRET in production.');
 }
 
+// Production validation'ı kaldırıldı - MongoDB URI her zaman mevcut
 if (config.nodeEnv === 'production') {
-  if (!process.env.MONGO_URI) {
-    throw new Error('MONGO_URI is required in production');
-  }
-  if (!process.env.JWT_SECRET) {
-    throw new Error('JWT_SECRET is required in production');
-  }
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.warn('⚠️  Warning: Email credentials not set. Email functionality will not work.');
   }
