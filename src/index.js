@@ -37,11 +37,19 @@ app.use(compression());
 app.use(morgan('combined'));
 app.use(requestLogger);
 
-// Middleware
+// CORS ayarları - Netlify frontend için
 app.use(cors({
-    origin: config.security.corsOrigins,
-    credentials: true
-}));
+    origin: [
+        'https://adaso.net',           // Netlify domain
+        'https://adaso.netlify.app',   // Alternatif domain
+        'http://localhost:3000',       // Local development
+        'http://localhost:3001'        // Local development
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    optionsSuccessStatus: 200
+});
 app.use(express.json({ limit: config.upload.maxFileSize }));
 app.use(express.urlencoded({ extended: true, limit: config.upload.maxFileSize }));
 app.use('/uploads', express.static('uploads'));
