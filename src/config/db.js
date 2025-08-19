@@ -12,8 +12,8 @@ const connectDB = async () => {
         useUnifiedTopology: true,
         serverSelectionTimeoutMS: 30000,
         socketTimeoutMS: 45000,
-        bufferCommands: false,
-        bufferMaxEntries: 0
+        bufferCommands: true, // Buffer commands until connection is ready
+        bufferMaxEntries: 1000
       });
       console.log('✅ MongoDB Atlas bağlantısı başarılı');
     } else {
