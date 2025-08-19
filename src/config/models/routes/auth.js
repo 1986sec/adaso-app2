@@ -13,14 +13,24 @@ router.post('/register', async (req, res) => {
   try {
     console.log('📝 Register request body:', req.body); // Debug için
     
-    const { username, email, password, fullName, phone } = req.body;
+    // Frontend'den gelen field'ları map et
+    const { adsoyad, email, kullaniciAdi, sifre, phone } = req.body;
+    
+    // Field mapping
+    const username = kullaniciAdi;
+    const password = sifre;
+    const fullName = adsoyad;
     
     // Validation kontrolü
     if (!username || !email || !password) {
       return res.status(400).json({ 
         message: 'Eksik alanlar',
-        required: ['username', 'email', 'password'],
-        received: { username: !!username, email: !!email, password: !!password }
+        required: ['kullaniciAdi', 'email', 'sifre'],
+        received: { 
+          kullaniciAdi: !!kullaniciAdi, 
+          email: !!email, 
+          sifre: !!sifre 
+        }
       });
     }
     
