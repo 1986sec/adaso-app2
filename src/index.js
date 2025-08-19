@@ -10,7 +10,6 @@ const connectDB = require(path.join(__dirname, 'config', 'db.js'));
 // Import middleware
 const { securityMiddleware, generalRateLimiter } = require('./middleware/security');
 const { requestLogger, errorLogger } = require('./middleware/logging');
-const { initRedis } = require('./middleware/cache');
 
 // Import Swagger
 const swaggerUi = require('swagger-ui-express');
@@ -21,9 +20,6 @@ const PORT = config.port;
 
 // Connect to MongoDB
 connectDB();
-
-// Initialize Redis
-initRedis();
 
 // Security middleware
 app.use(securityMiddleware);
