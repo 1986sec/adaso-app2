@@ -3,7 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
-const config = require('./config/config');
+const config = require('./config/config.js');
 const connectDB = require('./config/db');
 
 // Import middleware
