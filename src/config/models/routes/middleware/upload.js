@@ -1,6 +1,5 @@
 const multer = require('multer');
 const path = require('path');
-const path = require('path');
 const config = require(path.join(process.cwd(), 'src', 'config', 'config.js'));
 
 const storage = multer.diskStorage({
