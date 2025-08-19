@@ -11,14 +11,25 @@ const router = express.Router();
 // Register
 router.post('/register', async (req, res) => {
   try {
+    console.log('📝 Register request body:', req.body); // Debug için
+    
     const { username, email, password, fullName, phone } = req.body;
+    
+    // Validation kontrolü
+    if (!username || !email || !password) {
+      return res.status(400).json({ 
+        message: 'Eksik alanlar',
+        required: ['username', 'email', 'password'],
+        received: { username: !!username, email: !!email, password: !!password }
+      });
+    }
     
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({ message: 'Kullanıcı zaten mevcut' });
     }
 
-    const user = new User({ username, email, password, fullName, phone });
+    const user = new User({ username, email, password, fullName: fullName || '', phone: phone || '' });
     await user.save();
 
     const token = jwt.sign(
