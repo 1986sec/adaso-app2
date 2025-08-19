@@ -3,8 +3,9 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
-const config = require('./config/config.js');
-const connectDB = require('./config/db');
+const path = require('path');
+const config = require(path.join(__dirname, 'config', 'config.js'));
+const connectDB = require(path.join(__dirname, 'config', 'db.js'));
 
 // Import middleware
 const { securityMiddleware, generalRateLimiter } = require('./middleware/security');
@@ -13,7 +14,7 @@ const { initRedis } = require('./middleware/cache');
 
 // Import Swagger
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpecs = require('./config/swagger');
+const swaggerSpecs = require(path.join(__dirname, 'config', 'swagger.js'));
 
 const app = express();
 const PORT = config.port;
