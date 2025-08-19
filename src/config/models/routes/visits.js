@@ -1,5 +1,6 @@
 const express = require('express');
-const Visit = require('../Visit');
+const path = require('path');
+const Visit = require(path.join(process.cwd(), 'src', 'config', 'models', 'Visit.js'));
 const { authenticateToken, requireAdmin } = require('./middleware/auth');
 const upload = require('./middleware/upload');
 const router = express.Router();

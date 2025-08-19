@@ -1,5 +1,6 @@
 const express = require('express');
-const Company = require('../Company');
+const path = require('path');
+const Company = require(path.join(process.cwd(), 'src', 'config', 'models', 'Company.js'));
 const { authenticateToken, requireAdmin } = require('./middleware/auth');
 const router = express.Router();
 

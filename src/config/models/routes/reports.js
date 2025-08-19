@@ -1,9 +1,10 @@
 const express = require('express');
-const Company = require('../Company');
-const Visit = require('../Visit');
-const Transaction = require('../Transaction');
-const { authenticateToken } = require('./middleware/auth');
-const { generateCompaniesExcel, generateVisitsExcel, generateFinancialPDF } = require('../../utils/reportGenerator');
+const path = require('path');
+const Company = require(path.join(process.cwd(), 'src', 'config', 'models', 'Company.js'));
+const Visit = require(path.join(process.cwd(), 'src', 'config', 'models', 'Visit.js'));
+const Transaction = require(path.join(process.cwd(), 'src', 'config', 'models', 'Transaction.js'));
+const { authenticateToken } = require(path.join(process.cwd(), 'src', 'config', 'models', 'routes', 'middleware', 'auth.js'));
+const { generateCompaniesExcel, generateVisitsExcel, generateFinancialPDF } = require(path.join(process.cwd(), 'src', 'utils', 'reportGenerator.js'));
 const router = express.Router();
 
 // Dashboard stats

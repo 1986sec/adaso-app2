@@ -1,5 +1,6 @@
 const request = require('supertest');
-const app = require('../src/index');
+const path = require('path');
+const app = require(path.join(process.cwd(), 'src', 'index.js'));
 
 describe('Auth Endpoints', () => {
   test('GET /api/health', async () => {

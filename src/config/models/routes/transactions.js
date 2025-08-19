@@ -1,5 +1,6 @@
 const express = require('express');
-const Transaction = require('../Transaction');
+const path = require('path');
+const Transaction = require(path.join(process.cwd(), 'src', 'config', 'models', 'Transaction.js'));
 const { authenticateToken, requireAdmin } = require('./middleware/auth');
 const upload = require('./middleware/upload');
 const router = express.Router();
