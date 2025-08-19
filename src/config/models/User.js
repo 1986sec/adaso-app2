@@ -25,8 +25,9 @@ const userSchema = new mongoose.Schema({
   },
   fullName: {
     type: String,
-    required: [true, 'Tam ad gerekli'],
-    trim: true
+    required: false, // Optional yapıldı
+    trim: true,
+    default: ''
   },
   phone: {
     type: String,
