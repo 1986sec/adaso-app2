@@ -2,10 +2,6 @@ const express = require('express');
 const dns = require('dns');
 // Prefer IPv4 to avoid IPv6 connectivity issues in some Docker environments
 try { dns.setDefaultResultOrder('ipv4first'); } catch (_) {}
-// As a last resort for managed PG with custom CA chains
-if (!process.env.NODE_TLS_REJECT_UNAUTHORIZED) {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-}
 const helmet = require('helmet');
 const cors = require('cors');
 const morgan = require('morgan');
