@@ -16,8 +16,8 @@ const app = express();
 const PORT = process.env.PORT || 7000;
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN;
 
-// Trust proxy for Render/Heroku environments
-app.set('trust proxy', true);
+// Trust proxy for Render/Heroku environments - but be careful with rate limiting
+app.set('trust proxy', 1); // Only trust first proxy
 
 if (!process.env.JWT_SECRET) {
   // eslint-disable-next-line no-console
@@ -81,9 +81,21 @@ app.use(
 // Logging
 app.use(morgan('combined'));
 
-// Rate limits
-const authLimiter = rateLimit({ windowMs: 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false });
-const globalLimiter = rateLimit({ windowMs: 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false });
+// Rate limits - with proper IP handling for Render
+const authLimiter = rateLimit({ 
+  windowMs: 60 * 1000, 
+  max: 10, 
+  standardHeaders: true, 
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip || req.connection.remoteAddress
+});
+const globalLimiter = rateLimit({ 
+  windowMs: 60 * 1000, 
+  max: 100, 
+  standardHeaders: true, 
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip || req.connection.remoteAddress
+});
 app.use(globalLimiter);
 
 // Root endpoint
@@ -141,12 +153,13 @@ app.use(errorHandler);
 // Async server startup to handle DB init properly
 async function startServer() {
   try {
-    const port = process.env.PORT || 3000;
+    const port = process.env.PORT || 10000;
     app.listen(port, () => {
       // eslint-disable-next-line no-console
       console.log(`🚀 ADASO API Server running on port ${port}`);
       console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🔗 Health check: http://localhost:${port}/api/health`);
+      console.log(`🔗 Render URL: https://adaso-backend.onrender.com`);
     });
   } catch (err) {
     console.error('❌ Server startup failed:', err);

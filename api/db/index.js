@@ -5,8 +5,18 @@ let connected = false;
 
 function getPool() {
   if (!pool) {
-    const connectionString = process.env.DATABASE_URL;
+    let connectionString = process.env.DATABASE_URL;
     if (!connectionString) throw new Error('DATABASE_URL is required');
+    
+    // Force SSL parameters in connection string
+    if (!connectionString.includes('sslmode=')) {
+      connectionString += '?sslmode=require';
+    }
+    if (!connectionString.includes('family=')) {
+      connectionString += connectionString.includes('?') ? '&family=4' : '?family=4';
+    }
+    
+    console.log('🔗 DATABASE_URL:', connectionString.replace(/:[^:@]*@/, ':****@')); // Hide password
     
     // Force SSL bypass for Supabase self-signed certificates
     const sslConfig = {
@@ -17,15 +27,15 @@ function getPool() {
     pool = new Pool({
       connectionString,
       ssl: sslConfig,
-      connectionTimeoutMillis: 10000, // Increased timeout
+      connectionTimeoutMillis: 15000, // Increased timeout
       keepAlive: true,
-      max: 20, // Connection pool size
+      max: 10, // Reduced pool size
       idleTimeoutMillis: 30000,
     });
     
     // Test connection immediately
     pool.on('error', (err) => {
-      console.error('Unexpected error on idle client', err);
+      console.error('❌ Pool error:', err.message);
       connected = false;
     });
   }
