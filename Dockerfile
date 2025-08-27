@@ -9,8 +9,10 @@ COPY package*.json ./
 # Install build tools for native modules (e.g., bcrypt)
 RUN apk add --no-cache python3 make g++
 
-# Install dependencies
-RUN npm ci --omit=dev
+# Install dependencies (fallback to install if ci fails in certain npm versions)
+RUN npm config set fund false \
+ && npm config set audit false \
+ && npm install --omit=dev --no-audit --no-fund
 
 # Copy source code
 COPY . .
