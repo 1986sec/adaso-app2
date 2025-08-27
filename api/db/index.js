@@ -10,6 +10,8 @@ function getPool() {
     pool = new Pool({
       connectionString,
       ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : undefined,
+      connectionTimeoutMillis: 5000,
+      keepAlive: true,
     });
   }
   return pool;

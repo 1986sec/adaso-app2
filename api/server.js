@@ -1,4 +1,7 @@
 const express = require('express');
+const dns = require('dns');
+// Prefer IPv4 to avoid IPv6 connectivity issues in some Docker environments
+try { dns.setDefaultResultOrder('ipv4first'); } catch (_) {}
 const helmet = require('helmet');
 const cors = require('cors');
 const morgan = require('morgan');
