@@ -2,19 +2,19 @@
   "name": "adaso-backend",
   "version": "1.0.0",
   "description": "ADASO Firma Takip Sistemi Backend",
-  "main": "src/index.js",
+  "main": "server.js",
   "keywords": [
     "adaso",
     "backend",
     "api",
     "nodejs",
     "express",
-    "mongodb"
+    "postgres"
   ],
   "author": "ADASO Team",
   "license": "MIT",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node api/server.js",
     "dev": "nodemon src/index.js",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -48,11 +48,12 @@
     "express-validator": "^7.2.1",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.5.2",
+    
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.14",
     "pdfkit": "^0.15.0",
+    "pg": "^8.16.3",
     "redis": "^5.8.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",

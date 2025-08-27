@@ -1,7 +1,7 @@
 const request = require('supertest');
 const path = require('path');
 const app = require(path.join(process.cwd(), 'src', 'index.js'));
-const mongoose = require('mongoose');
+// Removed mongoose usage; app uses Postgres
 
 describe('Companies API', () => {
   let authToken;
@@ -22,7 +22,7 @@ describe('Companies API', () => {
   });
 
   afterAll(async () => {
-    await mongoose.connection.close();
+    // no-op
   });
 
   describe('GET /api/companies', () => {

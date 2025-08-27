@@ -10,8 +10,8 @@ const config = {
   port: process.env.PORT || 7000,
   nodeEnv: process.env.NODE_ENV || 'development',
   
-  // MongoDB Configuration
-  mongoURI: process.env.MONGO_URI || 'mongodb+srv://y3456605:pl6jF7glwEnTJO30@adaso-cluster.fjk5ist.mongodb.net/?retryWrites=true&w=majority&appName=adaso-cluster',
+  // Postgres (Supabase) Configuration
+  databaseUrl: process.env.DATABASE_URL,
   
   // JWT Configuration
   jwtSecret: process.env.JWT_SECRET || 'adaso_super_secret_jwt_key_2024',

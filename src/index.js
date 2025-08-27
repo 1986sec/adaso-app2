@@ -14,12 +14,16 @@ const { requestLogger, errorLogger } = require('./middleware/logging');
 // Import Swagger
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require(path.join(__dirname, 'config', 'swagger.js'));
+const { initSchema } = require('./config/schema');
 
 const app = express();
 const PORT = config.port;
 
-// Connect to MongoDB
-connectDB();
+// Connect to Postgres (Supabase)
+connectDB().then(() => initSchema().catch(err => {
+    console.error('Schema init failed', err);
+    process.exit(1);
+}));
 
 // Security middleware
 app.use(securityMiddleware);
@@ -34,115 +38,74 @@ app.use(compression());
 app.use(morgan('combined'));
 app.use(requestLogger);
 
-// CORS ayarları - Netlify frontend için
+// CORS - only allow FRONTEND_ORIGIN
+const allowedOrigin = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
 app.use(cors({
-    origin: [
-        'https://adaso.net',           // Netlify domain
-        'https://adaso.netlify.app',   // Alternatif domain
-        'http://localhost:3000',       // Local development
-        'http://localhost:3001'        // Local development
-    ],
+    origin: allowedOrigin,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     optionsSuccessStatus: 200
 }));
 
-app.use(express.json({ limit: config.upload.maxFileSize }));
-app.use(express.urlencoded({ extended: true, limit: config.upload.maxFileSize }));
-app.use('/uploads', express.static('uploads'));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+if (process.env.STORAGE_PROVIDER === 'local') {
+    app.use('/uploads', express.static('uploads'));
+}
 
 // Import routes
-const authRoutes = require('./config/models/routes/auth');
-const companyRoutes = require('./config/models/routes/companies');
-const visitRoutes = require('./config/models/routes/visits');
-const transactionRoutes = require('./config/models/routes/transactions');
-const reportRoutes = require('./config/models/routes/reports');
-const uploadRoutes = require('./config/models/routes/upload');
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
+const firmalarRoutes = require('./routes/firmalar');
+const ziyaretlerRoutes = require('./routes/ziyaretler');
+const gelirGiderRoutes = require('./routes/gelirGider');
+const searchRoutes = require('./routes/search');
 
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
-// Use routes
 app.use('/api/auth', authRoutes);
-app.use('/api/companies', companyRoutes);
-app.use('/api/visits', visitRoutes);
-app.use('/api/transactions', transactionRoutes);
-app.use('/api/reports', reportRoutes);
-app.use('/api/upload', uploadRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/firmalar', firmalarRoutes);
+app.use('/api/ziyaretler', ziyaretlerRoutes);
+app.use('/api/gelir-gider', gelirGiderRoutes);
+app.use('/api/search', searchRoutes);
 
-// Test route
-app.get('/api/test', (req, res) => {
-    res.json({ message: 'API çalışıyor!', timestamp: new Date() });
-});
+// Base URL: /api
 
-// Users listesi route'u (sadece development için)
-app.get('/api/users', async (req, res) => {
-    try {
-        const User = require(path.join(__dirname, 'config', 'models', 'User.js'));
-        const users = await User.find({}, { password: 0 }); // Şifreleri gösterme
-        res.json({ users });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
+// Remove dev-only Mongo-specific routes
 
-// Health check route
+// Health check route per spec
 app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'OK', 
-        timestamp: new Date(),
-        database: 'Connected',
+    res.status(200).json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        database: checkConnection() ? 'Connected' : 'Disconnected',
         version: '1.0.0',
         environment: config.nodeEnv
     });
 });
 
-// 404 handler
+// 404 handler with error format
 app.use('*', (req, res) => {
-    res.status(404).json({ message: 'Route bulunamadı' });
+    res.status(404).json({ error: true, message: 'Route bulunamadı', code: 'NOT_FOUND' });
 });
 
 // Error logging
 app.use(errorLogger);
 
-// Global error handler
+// Global error handler with unified format
 app.use((err, req, res, next) => {
     console.error('Error:', err);
-    
-    if (err.name === 'ValidationError') {
-        return res.status(400).json({ 
-            message: 'Validation Error', 
-            errors: Object.values(err.errors).map(e => e.message) 
-        });
-    }
-    
-    if (err.name === 'CastError') {
-        return res.status(400).json({ message: 'Geçersiz ID formatı' });
-    }
-    
-    if (err.code === 11000) {
-        return res.status(400).json({ message: 'Bu kayıt zaten mevcut' });
-    }
-    
-    res.status(err.status || 500).json({ 
-        message: err.message || 'Sunucu hatası oluştu' 
+    const status = err.status || 500;
+    res.status(status).json({
+        error: true,
+        message: err.message || 'Sunucu hatası oluştu',
+        code: err.code || 'INTERNAL_ERROR'
     });
 });
 
-if (require.main === module) {
-  app.listen(PORT, () => {
-    const serverUrl = config.nodeEnv === 'production' 
-      ? 'https://adaso-backend.onrender.com' 
-      : `http://localhost:${PORT}`;
-    
-    console.log(`🚀 ADASO API Server running on ${serverUrl}`);
-    console.log(`📊 Database: ${config.nodeEnv === 'production' ? 'MongoDB Atlas' : 'Mock Mode'}`);
-    console.log(`🌍 Environment: ${config.nodeEnv}`);
-    console.log(`🔐 JWT Secret: ${config.jwtSecret ? 'Set' : 'Default'}`);
-    console.log(`📧 Email: ${config.email.user !== 'your-email@gmail.com' ? 'Configured' : 'Not configured'}`);
-    console.log(`✅ Server started successfully!`);
-  });
-}
+// app exported; listening handled by server.js
 
 module.exports = app;

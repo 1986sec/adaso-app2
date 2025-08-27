@@ -1,6 +1,6 @@
-# ADASO Backend API
+# ADASO Backend (Express + Supabase Postgres)
 
-ADASO Firma Takip Sistemi'nin backend API'si. Node.js, Express ve MongoDB kullanılarak geliştirilmiştir.
+ADASO Firma Takip Sistemi'nin backend API'si. Node.js, Express ve Supabase Postgres kullanılarak geliştirilmiştir.
 
 ## 🚀 Özellikler
 
@@ -21,7 +21,7 @@ ADASO Firma Takip Sistemi'nin backend API'si. Node.js, Express ve MongoDB kullan
 ## 📋 Gereksinimler
 
 - Node.js (v16 veya üzeri)
-- MongoDB (v5 veya üzeri)
+- Supabase Postgres
 - npm veya yarn
 
 ## 🛠️ Kurulum
@@ -44,39 +44,20 @@ cp .env.example .env
 
 4. **`.env` dosyasını düzenleyin:**
 ```env
-# Server Configuration
 PORT=7000
-NODE_ENV=development
-
-# MongoDB Configuration
-MONGO_URI=mongodb://localhost:27017/adaso_db
-
-# JWT Configuration
-JWT_SECRET=your-super-secret-jwt-key
+NODE_ENV=production
+FRONTEND_ORIGIN=https://adaso.net
+JWT_SECRET=deger-girin
 JWT_EXPIRE=7d
-
-# Email Configuration
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-app-password
-
-# Frontend URL
-FRONTEND_URL=http://localhost:3000
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DB
+PGSSLMODE=require
 ```
 
-5. **MongoDB'yi başlatın:**
-```bash
-# MongoDB servisini başlatın
-mongod
-```
+5. **Supabase Postgres bağlantısı:** `.env` içine `DATABASE_URL` girin ve `PGSSLMODE=require` ayarlayın.
 
 6. **Uygulamayı başlatın:**
 ```bash
-# Development modunda
-npm run dev
-
-# Production modunda
+# api/server.js üzerinden
 npm start
 ```
 
@@ -196,20 +177,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 - CORS konfigürasyonu
 - Rate limiting (gelecekte eklenecek)
 
-## 📝 Environment Variables
+## 📂 Yeni Proje Yapısı
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | Server port | 7000 |
-| `NODE_ENV` | Environment | development |
-| `MONGO_URI` | MongoDB connection string | - |
-| `JWT_SECRET` | JWT secret key | - |
-| `JWT_EXPIRE` | JWT expiration time | 7d |
-| `EMAIL_HOST` | SMTP host | - |
-| `EMAIL_PORT` | SMTP port | 587 |
-| `EMAIL_USER` | SMTP username | - |
-| `EMAIL_PASS` | SMTP password | - |
-| `FRONTEND_URL` | Frontend URL | http://localhost:3000 |
+api/
+  server.js (app init, CORS, Helmet, rate limit, routes, health)
+  routes/
+  controllers/
+  services/
+  repositories/
+  db/
+  middleware/
+  utils/
 
 ## 🧪 Test
 

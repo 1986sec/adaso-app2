@@ -1,75 +1,37 @@
 
-const mongoose = require('mongoose');
+const { Pool } = require('pg');
 const path = require('path');
 const config = require(path.join(process.cwd(), 'src', 'config', 'config.js'));
 
+let pool;
 let isConnected = false;
 
 const connectDB = async () => {
   try {
-    console.log('🔄 MongoDB Atlas\'a bağlanılıyor...');
-    console.log('📍 URI:', config.mongoURI ? 'Mevcut' : 'Eksik');
-    console.log('🌍 Environment:', config.nodeEnv);
-    
-    // MongoDB bağlantısı - bufferCommands: true ile
-    await mongoose.connect(config.mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 60000, // 60 saniye
-      socketTimeoutMS: 60000, // 60 saniye
-      bufferCommands: true, // Buffer'ı aç - bu önemli!
-      maxPoolSize: 1, // Tek bağlantı
-      minPoolSize: 1,
-      maxIdleTimeMS: 30000,
-      retryWrites: true,
-      w: 'majority',
-      readPreference: 'primary'
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) throw new Error('DATABASE_URL env missing');
+
+    pool = new Pool({
+      connectionString,
+      ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : undefined
     });
-    
-    // Bağlantı durumunu kontrol et
-    mongoose.connection.on('connected', () => {
-      console.log('✅ MongoDB Atlas bağlantısı başarılı');
-      isConnected = true;
-    });
-    
-    mongoose.connection.on('error', (err) => {
-      console.error('❌ MongoDB bağlantı hatası:', err);
-      isConnected = false;
-    });
-    
-    mongoose.connection.on('disconnected', () => {
-      console.log('⚠️ MongoDB bağlantısı kesildi');
-      isConnected = false;
-    });
-    
-    // Bağlantının hazır olmasını bekle
-    await new Promise((resolve, reject) => {
-      if (mongoose.connection.readyState === 1) {
-        resolve();
-      } else {
-        mongoose.connection.once('connected', resolve);
-        mongoose.connection.once('error', reject);
-        
-        // 30 saniye timeout
-        setTimeout(() => reject(new Error('Connection timeout')), 30000);
-      }
-    });
-    
-    console.log('✅ MongoDB bağlantısı tamamen hazır!');
-    
+
+    // Simple test query
+    await pool.query('SELECT 1');
+    isConnected = true;
+    console.log('✅ Postgres (Supabase) bağlantısı başarılı');
   } catch (error) {
-    console.error('❌ Database bağlantı hatası:', error.message);
-    console.error('🔍 Hata detayı:', error);
-    
-    // Hata durumunda process'i sonlandır
-    console.log('💥 Kritik hata: MongoDB bağlantısı kurulamadı');
+    isConnected = false;
+    console.error('❌ Postgres bağlantı hatası:', error);
     process.exit(1);
   }
 };
 
-// Bağlantı durumunu kontrol et
-const checkConnection = () => {
-  return isConnected && mongoose.connection.readyState === 1;
+const checkConnection = () => isConnected;
+
+const getPool = () => {
+  if (!pool) throw new Error('DB not initialized');
+  return pool;
 };
 
-module.exports = { connectDB, checkConnection };
+module.exports = { connectDB, checkConnection, getPool };
