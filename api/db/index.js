@@ -9,7 +9,8 @@ function getPool() {
     if (!connectionString) throw new Error('DATABASE_URL is required');
     pool = new Pool({
       connectionString,
-      ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : undefined,
+      // Force SSL but ignore custom CA to avoid SELF_SIGNED_CERT_IN_CHAIN on managed providers
+      ssl: { rejectUnauthorized: false },
       connectionTimeoutMillis: 5000,
       keepAlive: true,
     });
