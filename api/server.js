@@ -20,6 +20,9 @@ const app = express();
 const PORT = process.env.PORT || 7000;
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN;
 
+// Trust proxy for Render/Heroku environments
+app.set('trust proxy', true);
+
 if (!process.env.JWT_SECRET) {
   // eslint-disable-next-line no-console
   console.warn('⚠️  JWT_SECRET is not set.');
@@ -59,6 +62,24 @@ app.use(morgan('combined'));
 const authLimiter = rateLimit({ windowMs: 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false });
 const globalLimiter = rateLimit({ windowMs: 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false });
 app.use(globalLimiter);
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'ADASO API Server',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      user: '/api/user',
+      firmalar: '/api/firmalar',
+      ziyaretler: '/api/ziyaretler',
+      gelirGider: '/api/gelir-gider',
+      search: '/api/search'
+    }
+  });
+});
 
 // Health
 app.get('/api/health', (req, res) => {
