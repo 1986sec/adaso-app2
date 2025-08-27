@@ -28,6 +28,18 @@ if (!FRONTEND_ORIGIN) {
   console.warn('⚠️  FRONTEND_ORIGIN is not set.');
 }
 
+// Try to read npm debug log if exists
+const fs = require('fs');
+const logPath = '/home/nodejs/.npm/_logs/2025-08-27T16_18_50_400Z-debug-0.log';
+try {
+  if (fs.existsSync(logPath)) {
+    const logContent = fs.readFileSync(logPath, 'utf8');
+    console.log('🔍 Debug Log Found:', logContent);
+  }
+} catch (err) {
+  console.log('📝 No debug log found or cannot read:', err.message);
+}
+
 // Database init (create tables if not exist)
 initDb().catch((err) => {
   // eslint-disable-next-line no-console
@@ -111,10 +123,23 @@ app.use('*', (req, res) => {
 // Error handler
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`🚀 ADASO API Server running on http://localhost:${PORT}`);
-});
+// Async server startup to handle DB init properly
+async function startServer() {
+  try {
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      // eslint-disable-next-line no-console
+      console.log(`🚀 ADASO API Server running on port ${port}`);
+      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🔗 Health check: http://localhost:${port}/api/health`);
+    });
+  } catch (err) {
+    console.error('❌ Server startup failed:', err);
+    process.exit(1);
+  }
+}
+
+startServer();
 
 module.exports = app;
 
