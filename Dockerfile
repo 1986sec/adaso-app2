@@ -6,8 +6,11 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
+# Install build tools for native modules (e.g., bcrypt)
+RUN apk add --no-cache python3 make g++
+
 # Install dependencies
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy source code
 COPY . .
