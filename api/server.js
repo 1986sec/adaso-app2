@@ -29,7 +29,7 @@ if (!FRONTEND_ORIGIN) {
 initDb().catch((err) => {
   // eslint-disable-next-line no-console
   console.error('DB init failed:', err);
-  process.exit(1);
+  // Don't exit; keep app running so health can report Disconnected and DB may become reachable later
 });
 
 // Security
