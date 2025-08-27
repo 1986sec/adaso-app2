@@ -40,12 +40,27 @@ try {
   console.log('📝 No debug log found or cannot read:', err.message);
 }
 
-// Database init (create tables if not exist)
-initDb().catch((err) => {
-  // eslint-disable-next-line no-console
-  console.error('DB init failed:', err);
-  // Don't exit; keep app running so health can report Disconnected and DB may become reachable later
-});
+// Database init (create tables if not exist) - with retry logic
+async function initializeDatabase() {
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      await initDb();
+      console.log('🎉 Veritabanı başarıyla başlatıldı!');
+      return;
+    } catch (err) {
+      console.error(`❌ DB init failed (${retries} retries left):`, err.message);
+      retries--;
+      if (retries > 0) {
+        console.log(`🔄 ${retries} saniye sonra tekrar deneniyor...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+  }
+  console.error('💥 Veritabanı başlatılamadı, uygulama devam ediyor...');
+}
+
+initializeDatabase();
 
 // Security
 app.use(helmet());

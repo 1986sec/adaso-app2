@@ -7,20 +7,36 @@ function getPool() {
   if (!pool) {
     const connectionString = process.env.DATABASE_URL;
     if (!connectionString) throw new Error('DATABASE_URL is required');
+    
+    // Force SSL bypass for Supabase self-signed certificates
+    const sslConfig = {
+      rejectUnauthorized: false,
+      sslmode: 'require'
+    };
+    
     pool = new Pool({
       connectionString,
-      // Force SSL but ignore custom CA to avoid SELF_SIGNED_CERT_IN_CHAIN on managed providers
-      ssl: { rejectUnauthorized: false },
-      connectionTimeoutMillis: 5000,
+      ssl: sslConfig,
+      connectionTimeoutMillis: 10000, // Increased timeout
       keepAlive: true,
+      max: 20, // Connection pool size
+      idleTimeoutMillis: 30000,
+    });
+    
+    // Test connection immediately
+    pool.on('error', (err) => {
+      console.error('Unexpected error on idle client', err);
+      connected = false;
     });
   }
   return pool;
 }
 
 async function initDb() {
+  console.log('🔌 Veritabanı bağlantısı başlatılıyor...');
   const client = await getPool().connect();
   try {
+    console.log('✅ Veritabanı bağlantısı başarılı!');
     await client.query('BEGIN');
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
