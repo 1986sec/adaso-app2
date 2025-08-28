@@ -84,10 +84,16 @@ async function createVisit(payload) {
       
       console.log('🔍 Final dosyalar:', dosyalar);
       
-      // Eğer boş array ise null yap
-      if (dosyalar.length === 0) {
-        dosyalar = null;
-      }
+             // Eğer boş array ise null yap
+       if (dosyalar.length === 0) {
+         dosyalar = null;
+       }
+       
+       // Dosyalar array'ini JSON string'e çevir (PostgreSQL için)
+       if (dosyalar && Array.isArray(dosyalar)) {
+         dosyalar = JSON.stringify(dosyalar);
+         console.log('🔍 Dosyalar JSON string\'e çevrildi:', dosyalar);
+       }
       
     } catch (error) {
       console.error('❌ Dosyalar işleme hatası:', error);
@@ -96,15 +102,19 @@ async function createVisit(payload) {
     }
   }
   
-  const { rows } = await pool.query(
-    `INSERT INTO ziyaretler (tarih, saat, firma, ziyaretci, amac, durum, notlar, detayli_bilgi, katilimcilar, lokasyon, dosyalar, gelir_tutari, gider_tutari, finansal_aciklama)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
-     RETURNING id, to_char(tarih,'YYYY-MM-DD') as tarih, saat, firma, ziyaretci, amac, durum,
-               notlar, detayli_bilgi AS "detayliBilgi", katilimcilar, lokasyon, dosyalar,
-               COALESCE(gelir_tutari,0) AS "gelirTutari", COALESCE(gider_tutari,0) AS "giderTutari",
-               finansal_aciklama AS "finansalAciklama"`,
-    [payload.tarih, payload.saat, payload.firma, payload.ziyaretci, payload.amac, payload.durum, payload.notlar || null, payload.detayliBilgi || null, payload.katilimcilar || null, payload.lokasyon || null, dosyalar, payload.gelirTutari || null, payload.giderTutari || null, payload.finansalAciklama || null]
-  );
+     // Debug: Son dosyalar değerini logla
+   console.log('🔍 Database\'e gönderilecek dosyalar:', dosyalar);
+   console.log('🔍 Dosyalar JSON string:', JSON.stringify(dosyalar));
+   
+   const { rows } = await pool.query(
+     `INSERT INTO ziyaretler (tarih, saat, firma, ziyaretci, amac, durum, notlar, detayli_bilgi, katilimcilar, lokasyon, dosyalar, gelir_tutari, gider_tutari, finansal_aciklama)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+      RETURNING id, to_char(tarih,'YYYY-MM-DD') as tarih, saat, firma, ziyaretci, amac, durum,
+                notlar, detayli_bilgi AS "detayliBilgi", katilimcilar, lokasyon, dosyalar,
+                COALESCE(gelir_tutari,0) AS "gelirTutari", COALESCE(gider_tutari,0) AS "giderTutari",
+                finansal_aciklama AS "finansalAciklama"`,
+     [payload.tarih, payload.saat, payload.firma, payload.ziyaretci, payload.amac, payload.durum, payload.notlar || null, payload.detayliBilgi || null, payload.katilimcilar || null, payload.lokasyon || null, dosyalar, payload.gelirTutari || null, payload.giderTutari || null, payload.finansalAciklama || null]
+   );
   return rows[0];
 }
 
@@ -185,10 +195,16 @@ async function updateVisit(id, fields) {
       
       console.log('🔍 Update - Final dosyalar:', fields.dosyalar);
       
-      // Eğer boş array ise null yap
-      if (fields.dosyalar.length === 0) {
-        fields.dosyalar = null;
-      }
+             // Eğer boş array ise null yap
+       if (fields.dosyalar.length === 0) {
+         fields.dosyalar = null;
+       }
+       
+       // Dosyalar array'ini JSON string'e çevir (PostgreSQL için)
+       if (fields.dosyalar && Array.isArray(fields.dosyalar)) {
+         fields.dosyalar = JSON.stringify(fields.dosyalar);
+         console.log('🔍 Update - Dosyalar JSON string\'e çevrildi:', fields.dosyalar);
+       }
       
     } catch (error) {
       console.error('❌ Update - Dosyalar işleme hatası:', error);
