@@ -58,8 +58,29 @@ async function createVisit(payload) {
         dosyalar = [dosyalar];
       }
       
-      // Array içindeki elemanları temizle
-      dosyalar = dosyalar.filter(item => item && typeof item === 'string').map(item => item.trim());
+             // Array içindeki elemanları temizle ve dosya adlarını düzelt
+       dosyalar = dosyalar.filter(item => item && typeof item === 'string').map(item => {
+         let fileName = item.trim();
+         
+         // Türkçe karakterleri ve özel karakterleri düzelt
+         fileName = fileName
+           .replace(/ü/g, 'u')
+           .replace(/Ü/g, 'U')
+           .replace(/ı/g, 'i')
+           .replace(/İ/g, 'I')
+           .replace(/ğ/g, 'g')
+           .replace(/Ğ/g, 'G')
+           .replace(/ş/g, 's')
+           .replace(/Ş/g, 'S')
+           .replace(/ç/g, 'c')
+           .replace(/Ç/g, 'C')
+           .replace(/ö/g, 'o')
+           .replace(/Ö/g, 'O')
+           .replace(/[^a-zA-Z0-9._-]/g, '_'); // Sadece güvenli karakterleri bırak
+         
+         console.log('🔍 Dosya adı düzeltildi:', item, '->', fileName);
+         return fileName;
+       });
       
       console.log('🔍 Final dosyalar:', dosyalar);
       
@@ -138,8 +159,29 @@ async function updateVisit(id, fields) {
         fields.dosyalar = [fields.dosyalar];
       }
       
-      // Array içindeki elemanları temizle
-      fields.dosyalar = fields.dosyalar.filter(item => item && typeof item === 'string').map(item => item.trim());
+             // Array içindeki elemanları temizle ve dosya adlarını düzelt
+       fields.dosyalar = fields.dosyalar.filter(item => item && typeof item === 'string').map(item => {
+         let fileName = item.trim();
+         
+         // Türkçe karakterleri ve özel karakterleri düzelt
+         fileName = fileName
+           .replace(/ü/g, 'u')
+           .replace(/Ü/g, 'U')
+           .replace(/ı/g, 'i')
+           .replace(/İ/g, 'I')
+           .replace(/ğ/g, 'g')
+           .replace(/Ğ/g, 'G')
+           .replace(/ş/g, 's')
+           .replace(/Ş/g, 'S')
+           .replace(/ç/g, 'c')
+           .replace(/Ç/g, 'C')
+           .replace(/ö/g, 'o')
+           .replace(/Ö/g, 'O')
+           .replace(/[^a-zA-Z0-9._-]/g, '_'); // Sadece güvenli karakterleri bırak
+         
+         console.log('🔍 Update - Dosya adı düzeltildi:', item, '->', fileName);
+         return fileName;
+       });
       
       console.log('🔍 Update - Final dosyalar:', fields.dosyalar);
       
