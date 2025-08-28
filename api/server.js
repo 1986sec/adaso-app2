@@ -21,7 +21,8 @@ app.set('trust proxy', 1); // Only trust first proxy
 
 if (!process.env.JWT_SECRET) {
   // eslint-disable-next-line no-console
-  console.warn('⚠️  JWT_SECRET is not set.');
+  console.warn('⚠️  JWT_SECRET is not set, using default secret.');
+  process.env.JWT_SECRET = 'adaso-super-secret-jwt-key-2024-change-in-production';
 }
 if (!FRONTEND_ORIGIN) {
   // eslint-disable-next-line no-console

@@ -2,10 +2,21 @@ const users = require('../repositories/userRepo');
 
 async function profile(req, res, next) {
   try {
+    console.log('Profile request - User ID:', req.user.id);
+    console.log('Profile request - User object:', req.user);
+    
     const u = await users.findById(req.user.id);
-    if (!u) return res.status(404).json({ error: true, message: 'Kullanıcı bulunamadı', code: 'NOT_FOUND' });
+    if (!u) {
+      console.log('User not found in database for ID:', req.user.id);
+      return res.status(404).json({ error: true, message: 'Kullanıcı bulunamadı', code: 'NOT_FOUND' });
+    }
+    
+    console.log('User found:', { id: u.id, adsoyad: u.adsoyad, email: u.email, kullaniciAdi: u.kullanici_adi });
     return res.json({ id: u.id, adsoyad: u.adsoyad, email: u.email, kullaniciAdi: u.kullanici_adi, telefon: u.telefon });
-  } catch (e) { return next(e); }
+  } catch (e) { 
+    console.error('Profile error:', e);
+    return next(e); 
+  }
 }
 
 async function updateProfile(req, res, next) {

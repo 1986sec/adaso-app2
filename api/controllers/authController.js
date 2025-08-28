@@ -35,7 +35,7 @@ async function login(req, res, next) {
       return res.status(401).json({ error: true, message: 'Geçersiz bilgiler', code: 'UNAUTHORIZED' });
     }
     const token = signToken({ id: user.id, kullaniciAdi: user.kullanici_adi });
-    return res.json({ token: `Bearer ${token}`, user: { id: user.id, kullaniciAdi: user.kullanici_adi, adsoyad: user.adsoyad, email: user.email } });
+    return res.json({ token: token, user: { id: user.id, kullaniciAdi: user.kullanici_adi, adsoyad: user.adsoyad, email: user.email } });
   } catch (e) { return next(e); }
 }
 
