@@ -15,23 +15,62 @@ async function listVisits() {
 async function createVisit(payload) {
   const pool = getPool();
   
+  // Debug: Gelen veriyi logla
+  console.log('🔍 createVisit - Gelen payload:', JSON.stringify(payload, null, 2));
+  console.log('🔍 createVisit - dosyalar tipi:', typeof payload.dosyalar);
+  console.log('🔍 createVisit - dosyalar değeri:', payload.dosyalar);
+  
   // dosyalar alanını düzgün formatla
   let dosyalar = null;
   if (payload.dosyalar) {
     try {
-      // Eğer string ise JSON parse et
-      if (typeof payload.dosyalar === 'string') {
-        dosyalar = JSON.parse(payload.dosyalar);
+      let rawDosyalar = payload.dosyalar;
+      
+      // Eğer string ise
+      if (typeof rawDosyalar === 'string') {
+        console.log('🔍 String dosyalar işleniyor:', rawDosyalar);
+        
+        // Önce string'i temizle
+        rawDosyalar = rawDosyalar.trim();
+        
+        // Eğer geçersiz JSON formatı varsa düzelt
+        if (rawDosyalar.startsWith('{') && rawDosyalar.endsWith('}')) {
+          // {"dosya.pdf"} formatını ["dosya.pdf"] formatına çevir
+          const fileName = rawDosyalar.replace(/[{}"]/g, '');
+          console.log('🔍 Geçersiz JSON formatı düzeltiliyor:', rawDosyalar, '->', fileName);
+          dosyalar = [fileName];
+        } else {
+          // Normal JSON parse dene
+          try {
+            dosyalar = JSON.parse(rawDosyalar);
+          } catch (parseError) {
+            console.log('🔍 JSON parse başarısız, string olarak alınıyor:', rawDosyalar);
+            dosyalar = [rawDosyalar];
+          }
+        }
       } else {
-        dosyalar = payload.dosyalar;
+        dosyalar = rawDosyalar;
       }
       
       // Array değilse array'e çevir
       if (!Array.isArray(dosyalar)) {
+        console.log('🔍 Array değil, array\'e çevriliyor:', dosyalar);
         dosyalar = [dosyalar];
       }
+      
+      // Array içindeki elemanları temizle
+      dosyalar = dosyalar.filter(item => item && typeof item === 'string').map(item => item.trim());
+      
+      console.log('🔍 Final dosyalar:', dosyalar);
+      
+      // Eğer boş array ise null yap
+      if (dosyalar.length === 0) {
+        dosyalar = null;
+      }
+      
     } catch (error) {
-      console.error('Dosyalar JSON parse hatası:', error);
+      console.error('❌ Dosyalar işleme hatası:', error);
+      console.error('❌ Hatalı dosyalar değeri:', payload.dosyalar);
       dosyalar = null;
     }
   }
@@ -67,17 +106,51 @@ async function updateVisit(id, fields) {
   // dosyalar alanını düzgün formatla
   if (fields.dosyalar) {
     try {
-      // Eğer string ise JSON parse et
-      if (typeof fields.dosyalar === 'string') {
-        fields.dosyalar = JSON.parse(fields.dosyalar);
+      let rawDosyalar = fields.dosyalar;
+      
+      // Eğer string ise
+      if (typeof rawDosyalar === 'string') {
+        console.log('🔍 Update - String dosyalar işleniyor:', rawDosyalar);
+        
+        // Önce string'i temizle
+        rawDosyalar = rawDosyalar.trim();
+        
+        // Eğer geçersiz JSON formatı varsa düzelt
+        if (rawDosyalar.startsWith('{') && rawDosyalar.endsWith('}')) {
+          // {"dosya.pdf"} formatını ["dosya.pdf"] formatına çevir
+          const fileName = rawDosyalar.replace(/[{}"]/g, '');
+          console.log('🔍 Update - Geçersiz JSON formatı düzeltiliyor:', rawDosyalar, '->', fileName);
+          fields.dosyalar = [fileName];
+        } else {
+          // Normal JSON parse dene
+          try {
+            fields.dosyalar = JSON.parse(rawDosyalar);
+          } catch (parseError) {
+            console.log('🔍 Update - JSON parse başarısız, string olarak alınıyor:', rawDosyalar);
+            fields.dosyalar = [rawDosyalar];
+          }
+        }
       }
       
       // Array değilse array'e çevir
       if (!Array.isArray(fields.dosyalar)) {
+        console.log('🔍 Update - Array değil, array\'e çevriliyor:', fields.dosyalar);
         fields.dosyalar = [fields.dosyalar];
       }
+      
+      // Array içindeki elemanları temizle
+      fields.dosyalar = fields.dosyalar.filter(item => item && typeof item === 'string').map(item => item.trim());
+      
+      console.log('🔍 Update - Final dosyalar:', fields.dosyalar);
+      
+      // Eğer boş array ise null yap
+      if (fields.dosyalar.length === 0) {
+        fields.dosyalar = null;
+      }
+      
     } catch (error) {
-      console.error('Dosyalar JSON parse hatası:', error);
+      console.error('❌ Update - Dosyalar işleme hatası:', error);
+      console.error('❌ Update - Hatalı dosyalar değeri:', fields.dosyalar);
       fields.dosyalar = null;
     }
   }
