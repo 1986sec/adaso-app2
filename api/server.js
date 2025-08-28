@@ -68,13 +68,13 @@ app.use(helmet());
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-// CORS: only frontend origin
+// CORS: allow all origins in development, specific origin in production
 app.use(
   cors({
-    origin: FRONTEND_ORIGIN || false,
+    origin: FRONTEND_ORIGIN || true, // Allow all origins if FRONTEND_ORIGIN not set
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
     optionsSuccessStatus: 200,
   })
 );
