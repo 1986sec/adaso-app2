@@ -17,6 +17,22 @@ async function create(req, res, next) {
     if (!['Planlandı','Tamamlandı','İptal Edildi'].includes(req.body.durum)) {
       return res.status(400).json({ error: true, message: 'durum değeri geçersiz', code: 'VALIDATION_ERROR' });
     }
+    
+    // dosyalar alanını validate et
+    if (req.body.dosyalar) {
+      try {
+        let dosyalar = req.body.dosyalar;
+        if (typeof dosyalar === 'string') {
+          dosyalar = JSON.parse(dosyalar);
+        }
+        if (!Array.isArray(dosyalar)) {
+          return res.status(400).json({ error: true, message: 'Dosyalar alanı array olmalı', code: 'VALIDATION_ERROR' });
+        }
+      } catch (error) {
+        return res.status(400).json({ error: true, message: 'Dosyalar alanı geçersiz JSON formatı', code: 'VALIDATION_ERROR' });
+      }
+    }
+    
     const created = await visits.createVisit(req.body);
     return res.json(created);
   } catch (e) { return next(e); }
@@ -31,6 +47,22 @@ async function update(req, res, next) {
     if (req.body && req.body.durum !== undefined && !['Planlandı','Tamamlandı','İptal Edildi'].includes(req.body.durum)) {
       return res.status(400).json({ error: true, message: 'durum değeri geçersiz', code: 'VALIDATION_ERROR' });
     }
+    
+    // dosyalar alanını validate et
+    if (req.body && req.body.dosyalar) {
+      try {
+        let dosyalar = req.body.dosyalar;
+        if (typeof dosyalar === 'string') {
+          dosyalar = JSON.parse(dosyalar);
+        }
+        if (!Array.isArray(dosyalar)) {
+          return res.status(400).json({ error: true, message: 'Dosyalar alanı array olmalı', code: 'VALIDATION_ERROR' });
+        }
+      } catch (error) {
+        return res.status(400).json({ error: true, message: 'Dosyalar alanı geçersiz JSON formatı', code: 'VALIDATION_ERROR' });
+      }
+    }
+    
     const updated = await visits.updateVisit(id, req.body || {});
     if (!updated) return res.status(404).json({ error: true, message: 'Ziyaret bulunamadı', code: 'NOT_FOUND' });
     return res.json(updated);
