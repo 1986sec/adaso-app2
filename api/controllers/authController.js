@@ -11,9 +11,16 @@ async function register(req, res, next) {
     if (String(sifre).length < 6) {
       return res.status(400).json({ error: true, message: 'Şifre en az 6 karakter olmalı', code: 'WEAK_PASSWORD' });
     }
-    const exists = await users.findByUsernameOrEmail(kullaniciAdi) || await users.findByUsernameOrEmail(email);
-    if (exists) {
-      return res.status(409).json({ error: true, message: 'Kullanıcı zaten var', code: 'USER_EXISTS' });
+    // Kullanıcı adı kontrolü
+    const existingUser = await users.findByUsername(kullaniciAdi);
+    if (existingUser) {
+      return res.status(409).json({ error: true, message: 'Bu kullanıcı adı zaten kullanılıyor', code: 'USERNAME_EXISTS' });
+    }
+    
+    // Email kontrolü
+    const existingEmail = await users.findByEmail(email);
+    if (existingEmail) {
+      return res.status(409).json({ error: true, message: 'Bu email adresi zaten kullanılıyor', code: 'EMAIL_EXISTS' });
     }
     await users.createUser({ adsoyad, email, kullaniciAdi, sifre });
     return res.json({ ok: true });

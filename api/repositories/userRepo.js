@@ -10,6 +10,24 @@ async function findByUsernameOrEmail(identifier) {
   return rows[0] || null;
 }
 
+async function findByEmail(email) {
+  const pool = getPool();
+  const { rows } = await pool.query(
+    'SELECT id, adsoyad, email, kullanici_adi, sifre, telefon FROM users WHERE email=$1 LIMIT 1',
+    [email]
+  );
+  return rows[0] || null;
+}
+
+async function findByUsername(username) {
+  const pool = getPool();
+  const { rows } = await pool.query(
+    'SELECT id, adsoyad, email, kullanici_adi, sifre, telefon FROM users WHERE kullanici_adi=$1 LIMIT 1',
+    [username]
+  );
+  return rows[0] || null;
+}
+
 async function findById(id) {
   const pool = getPool();
   const { rows } = await pool.query(
@@ -83,6 +101,8 @@ async function changePassword(userId, oldPassword, newPassword) {
 
 module.exports = {
   findByUsernameOrEmail,
+  findByEmail,
+  findByUsername,
   findById,
   createUser,
   updateUser,
